@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Majestor Go — Tu ruta de bienvenida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Expanded:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #fbfaf7;
+    --paper: #ffffff;
+    --line: #e9e5da;
+    --line-soft: #f1eee6;
+    --ink: #17140f;
+    --ink-soft: #55503f;
+    --ink-faint: #8a8471;
+    --gold-dark: #b88900;
+    --gold: #d4a413;
+    --gold-light: #efb810;
+    --gold-tint: #fdf6e3;
+    --red: #dc282a;
+    --red-tint: #fdeceb;
+    --sidebar-bg: #0c0a08;
+    --sidebar-bg-2: #050403;
+    --sidebar-line: #262218;
+    --sidebar-text: #cfc9ba;
+    --sidebar-text-dim: #7d7768;
+    --display: "Archivo Expanded", "Archivo", sans-serif;
+    --sans: "Archivo", sans-serif;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --sidebar-w: 272px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--gold-dark);}
+  ::selection{background:var(--gold-light);color:#1a1400;}
+  :focus-visible{outline:2px solid var(--gold-dark); outline-offset:3px;}
+
+  h1,h2,h3,h4{font-family:var(--display); font-weight:700; margin:0; color:var(--ink);}
+  p{margin:0 0 14px 0; color:var(--ink-soft); text-align:justify; text-align-last:left;}
+  ul,ol{margin:0 0 14px 0; padding-left:22px; color:var(--ink-soft);}
+  li{margin-bottom:7px;}
+  strong{color:var(--ink); font-weight:600;}
+
+  .icn{stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;}
+
+  /* ---------- Reveal / motion utilities ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(14px) scale(0.98);
+    transition:opacity 460ms var(--ease-out), transform 460ms var(--ease-out);
+    transition-delay:var(--d, 0ms);
+  }
+  .reveal.in-view{opacity:1; transform:translateY(0) scale(1);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1; transform:none; transition:none;}
+  }
+
+  /* ---------- Layout shell ---------- */
+  .shell{display:flex; min-height:100vh;}
+
+  /* ---------- Sidebar (kept dark for contrast) ---------- */
+  .sidebar{
+    width:var(--sidebar-w); flex:0 0 var(--sidebar-w);
+    background:
+      repeating-linear-gradient(100deg, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px, transparent 1px, transparent 34px),
+      linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-2) 100%);
+    border-right:1px solid var(--sidebar-line);
+    padding:34px 26px 24px;
+    position:sticky; top:0; height:100vh;
+    display:flex; flex-direction:column;
+    z-index:20;
+  }
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+  .brand-text{display:flex; flex-direction:column;}
+  .brand-name{font-family:var(--display); font-size:21px; font-weight:700; letter-spacing:2px; color:#fff;}
+  .brand-tag{
+    display:inline-block; margin-top:4px; font-family:var(--sans); font-weight:600;
+    font-size:12px; letter-spacing:1.2px; color:#1a1400;
+    background:linear-gradient(120deg, var(--gold-light), var(--gold));
+    padding:2px 8px; border-radius:3px; width:fit-content;
+  }
+  .brand-sub{margin:16px 0 0; font-size:13.5px; color:var(--sidebar-text-dim); letter-spacing:.4px;}
+
+  .navlist{list-style:none; margin:30px 0 0; padding:0; display:flex; flex-direction:column; gap:2px; overflow-y:auto;}
+  .navlink{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:none; border:none; color:var(--sidebar-text); font-family:var(--sans); font-weight:500;
+    font-size:15.5px; padding:11px 12px; border-radius:8px; cursor:pointer;
+    transition:background 160ms var(--ease-out), color 160ms var(--ease-out), transform 140ms var(--ease-out);
+  }
+  .navlink svg{flex:0 0 auto; opacity:.7;}
+  .navlink:hover{background:rgba(255,255,255,.05); color:#fff;}
+  .navlink:active{transform:scale(0.97);}
+  .navlink.active{
+    background:linear-gradient(90deg, rgba(212,164,19,.22), rgba(212,164,19,.03));
+    color:#fff; box-shadow:inset 2px 0 0 var(--gold-light);
+  }
+  .navlink.active svg{opacity:1; color:var(--gold-light);}
+
+  .sidebar-footer{margin-top:auto; padding-top:20px; border-top:1px solid var(--sidebar-line);}
+  .pil{font-size:12px; letter-spacing:2px; color:var(--gold-light); display:flex; gap:6px; align-items:center; margin-bottom:12px;}
+  .pil span:nth-child(2){color:var(--sidebar-text-dim);}
+  .support-mini{font-size:13.5px; color:var(--sidebar-text-dim); line-height:1.8;}
+  .support-mini a{color:var(--sidebar-text); text-decoration:none;}
+  .support-mini a:hover{color:var(--gold-light);}
+
+  .menu-toggle{
+    display:none; position:fixed; top:16px; right:16px; z-index:40;
+    background:var(--sidebar-bg); border:1px solid var(--sidebar-line); border-radius:8px;
+    width:42px; height:42px; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .menu-toggle svg{width:20px; height:20px;}
+
+  /* ---------- Main content ---------- */
+  .main{flex:1 1 auto; min-width:0; padding:52px clamp(24px, 4vw, 64px) 100px;}
+  .panel{display:none; max-width:1180px; width:100%;}
+  .panel.active{display:block; animation:panelIn 420ms var(--ease-out);}
+  @keyframes panelIn{from{opacity:0; transform:translateY(8px) scale(0.99);} to{opacity:1; transform:translateY(0) scale(1);}}
+  @media (prefers-reduced-motion: reduce){ .panel.active{animation:none;} }
+
+  .head-row{display:flex; align-items:center; gap:14px; margin-bottom:6px;}
+  .head-icon{
+    flex:0 0 auto; width:44px; height:44px; border-radius:12px;
+    background:var(--gold-tint); border:1px solid #f1e3b8;
+    display:flex; align-items:center; justify-content:center; color:var(--gold-dark);
+  }
+  .eyebrow{font-size:13px; letter-spacing:2px; color:var(--gold-dark); font-weight:600; display:block; margin-bottom:4px;}
+  .panel h2{font-size:34px;}
+  .panel .lede{font-size:18px; color:var(--ink-soft); max-width:640px; margin-top:14px;}
+  .divider{height:1px; background:linear-gradient(90deg, var(--line), transparent); margin:32px 0;}
+
+  h3.section-h{font-size:20px; color:var(--ink); margin:36px 0 14px; display:flex; align-items:center; gap:10px;}
+  h3.section-h:first-of-type{margin-top:8px;}
+  h3.section-h .mini-icn{color:var(--gold-dark); flex:0 0 auto;}
+
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:14px;}
+
+  /* ---------- Hero banner ---------- */
+  .hero-banner{
+    position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    min-height:340px; text-align:center;
+    background:radial-gradient(120% 140% at 50% 0%, #2a2110 0%, #100c05 55%, #050403 100%);
+    border-radius:18px; padding:64px 32px; margin-bottom:34px;
+    isolation:isolate;
+  }
+  .hero-graphic{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:min(640px, 92%); opacity:.14; z-index:0; pointer-events:none;
+  }
+  .hero-copy{position:relative; z-index:1; max-width:640px; margin:0 auto; display:flex; flex-direction:column; align-items:center;}
+  .hero-glow{
+    position:absolute; inset:-40% -20% auto auto; width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle, rgba(239,184,16,.28) 0%, transparent 68%);
+    filter:blur(10px); z-index:-1;
+    animation:glowPulse 7s var(--ease-in-out) infinite;
+  }
+  @keyframes glowPulse{0%,100%{opacity:.55; transform:scale(1);} 50%{opacity:.95; transform:scale(1.08);}}
+  @media (prefers-reduced-motion: reduce){ .hero-glow{animation:none;} }
+
+  .hero-mark{display:flex; align-items:center; gap:12px; margin-bottom:26px;}
+  .hero-mark span{font-family:var(--sans); font-size:13px; letter-spacing:2px; color:var(--gold-light); font-weight:600;}
+  .hero-banner h1{color:#fff; font-size:clamp(30px, 4.2vw, 46px); line-height:1.18; margin-bottom:18px;}
+  .hero-banner p{color:#c9c2ab; font-size:18px; max-width:560px; margin:0 auto 26px; text-align:center; text-align-last:auto;}
+  .hero-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:10px;}
+  .hero-chip{
+    display:flex; align-items:center; gap:8px; font-size:13.5px; color:#f1e6c2;
+    background:rgba(255,255,255,.06); border:1px solid rgba(239,184,16,.3);
+    padding:8px 13px; border-radius:20px;
+  }
+  .hero-chip svg{color:var(--gold-light); flex:0 0 auto;}
+
+  .chip-row{display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 26px;}
+  .info-chip{
+    display:flex; align-items:center; gap:8px; font-size:14px; color:var(--ink-soft);
+    background:var(--paper); border:1px solid var(--line); padding:8px 13px; border-radius:20px;
+  }
+  .info-chip svg{color:var(--gold-dark); flex:0 0 auto;}
+
+  .hero-quote{margin-top:26px; padding-left:16px; border-left:2px solid var(--gold-dark); color:var(--ink-soft); font-style:italic;}
+
+  /* ---------- Stat / price chips ---------- */
+  .stat-row{display:flex; flex-wrap:wrap; gap:14px; margin:18px 0 28px;}
+  .stat-chip{
+    flex:1 1 200px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+    border-radius:12px; padding:18px 20px;
+  }
+  .stat-chip.cost{background:var(--red-tint); border:1px solid #f2c6c4;}
+  .stat-chip.earn{background:var(--gold-tint); border:1px solid #f1e3b8;}
+  .stat-chip .num{font-family:var(--display); font-size:32px; font-weight:700;}
+  .stat-chip.cost .num{color:var(--red);}
+  .stat-chip.earn .num{color:var(--gold-dark);}
+  .stat-chip .unit{font-size:14px; color:var(--ink-faint);}
+  .stat-chip .desc{width:100%; font-size:13.8px; color:var(--ink-soft); margin-top:2px;}
+
+  /* ---------- Benefit grid ---------- */
+  .benefit-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:14px; margin:6px 0 28px;}
+  .benefit{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:18px 19px;
+    transition:transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
+  }
+  @media (hover:hover) and (pointer:fine){
+    .benefit:hover{transform:translateY(-4px); box-shadow:0 16px 30px rgba(23,20,15,.07); border-color:#e3d9b8;}
+  }
+  .benefit-icon{
+    width:34px; height:34px; border-radius:9px; background:var(--gold-tint); color:var(--gold-dark);
+    display:flex; align-items:center; justify-content:center; margin-bottom:10px;
+  }
+  .benefit h4{font-size:15.5px; color:var(--ink); margin-bottom:5px;}
+  .benefit p{font-size:14.4px; margin:0;}
+
+  .not-included{background:var(--paper); border:1px dashed #d8d2c0; border-radius:12px; padding:18px 22px; margin-top:6px;}
+  .not-included h4{color:var(--ink); font-size:15.5px; margin-bottom:10px; font-family:var(--sans); font-weight:600; display:flex; align-items:center; gap:8px;}
+  .not-included ul{margin:0;}
+  .not-included li{color:var(--ink-soft); font-size:14.8px;}
+
+  /* ---------- Phase overview (Primeros pasos) ---------- */
+  .phase-overview{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px; margin:20px 0 30px;}
+  .phase-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:16px 14px; text-align:left;
+    transition:transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+  @media (hover:hover) and (pointer:fine){ .phase-card:hover{transform:translateY(-3px); box-shadow:0 14px 26px rgba(23,20,15,.06);} }
+  .phase-card .benefit-icon{margin-bottom:12px;}
+  .phase-card h4{font-size:14.5px; margin-bottom:3px;}
+  .phase-card span{font-size:13px; color:var(--ink-faint);}
+
+  .phase-label{
+    display:flex; align-items:center; gap:9px; margin:34px 0 4px; font-family:var(--sans);
+    font-weight:600; font-size:14px; letter-spacing:.6px; color:var(--gold-dark); text-transform:uppercase;
+  }
+  .phase-label:first-of-type{margin-top:10px;}
+  .phase-label svg{flex:0 0 auto;}
+
+  /* ---------- Steps (as accordions) ---------- */
+  .steps{position:relative; margin-top:10px; padding-left:2px;}
+  details.step{
+    position:relative; margin-left:16px; border-left:1px solid var(--line);
+    padding:0 0 6px 0;
+  }
+  details.step:last-child{border-left:1px solid transparent;}
+  details.step summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; gap:14px;
+    padding:12px 0 12px 30px; position:relative;
+  }
+  details.step summary::-webkit-details-marker{display:none;}
+  .step-num{
+    position:absolute; left:-17px; top:8px; width:33px; height:33px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--gold-dark); color:var(--gold-dark);
+    font-family:var(--display); font-size:14.5px; display:flex; align-items:center; justify-content:center;
+  }
+  details.step[open] .step-num{background:var(--gold-dark); color:#fff;}
+  .step-title{font-family:var(--sans); font-weight:600; font-size:16px; color:var(--ink); flex:1;}
+  .step-chevron{
+    flex:0 0 auto; color:var(--ink-faint); transition:transform 200ms var(--ease-out);
+  }
+  details.step[open] .step-chevron{transform:rotate(45deg); color:var(--gold-dark);}
+  .step-body{padding:0 0 22px 30px; font-size:15.4px; opacity:1; transition:opacity 220ms ease 40ms;}
+  details.step:not([open]) > .step-body{opacity:0; transition:opacity 140ms ease;}
+  .step-body p{font-size:15.4px; margin-bottom:8px;}
+  .step-body .mini-link{display:inline-block; margin-top:2px; font-size:14.5px; color:var(--gold-dark); word-break:break-word;}
+  .field-hint{
+    margin-top:8px; padding:10px 14px; background:var(--gold-tint); border:1px solid #f1e3b8;
+    border-left:3px solid var(--gold-dark); border-radius:6px; font-size:14.3px; color:var(--ink-soft);
+  }
+
+  /* ---------- Referral flow ---------- */
+  .flow-row{display:flex; align-items:center; gap:8px; margin:22px 0 30px; flex-wrap:wrap;}
+  .flow-step{
+    flex:1 1 160px; background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:18px 16px; text-align:center;
+  }
+  .flow-step .benefit-icon{margin:0 auto 10px;}
+  .flow-step h4{font-size:14.6px; margin-bottom:4px;}
+  .flow-step p{font-size:13.6px; margin:0;}
+  .flow-arrow{flex:0 0 auto; color:var(--gold-dark); display:flex; align-items:center;}
+  @media (max-width:700px){ .flow-arrow{transform:rotate(90deg);} }
+
+  /* ---------- Contact directory ---------- */
+  .directory{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:14px; margin-top:18px;}
+  .contact-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    transition:transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+  @media (hover:hover) and (pointer:fine){ .contact-card:hover{transform:translateY(-3px); box-shadow:0 14px 26px rgba(23,20,15,.06);} }
+  .contact-card .benefit-icon{margin-bottom:10px;}
+  .contact-card h4{font-size:15px; color:var(--ink); margin-bottom:5px; letter-spacing:.2px;}
+  .contact-card p{font-size:13.8px; margin:0 0 6px;}
+  .contact-card a{font-size:13.8px; display:block; text-decoration:none; color:var(--gold-dark);}
+  .contact-card a:hover{text-decoration:underline;}
+
+  .group-row{
+    display:flex; justify-content:space-between; align-items:center; gap:12px; padding:15px 18px;
+    background:var(--paper); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; flex-wrap:wrap;
+  }
+  .group-row strong{font-size:15.5px;}
+  .group-row a{
+    font-size:14px; background:var(--gold-tint); color:var(--gold-dark); padding:6px 13px;
+    border-radius:20px; text-decoration:none; white-space:nowrap; font-weight:600;
+    transition:background 160ms var(--ease-out), transform 140ms var(--ease-out);
+  }
+  .group-row a:hover{background:#f5e6b0;}
+  .group-row a:active{transform:scale(0.96);}
+
+  /* ---------- FAQ ---------- */
+  .faq-cat{display:flex; align-items:center; gap:9px; margin:30px 0 12px; font-weight:600; font-size:14px; letter-spacing:.5px; color:var(--gold-dark); text-transform:uppercase;}
+  .faq-cat:first-of-type{margin-top:8px;}
+  details.faq{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:4px 20px; margin-bottom:10px;
+    transition:border-color 160ms var(--ease-out);
+  }
+  details.faq:hover{border-color:#e3d9b8;}
+  details.faq summary{
+    cursor:pointer; padding:14px 0; font-size:16px; color:var(--ink); list-style:none;
+    display:flex; justify-content:space-between; align-items:center; gap:12px; font-weight:500;
+  }
+  details.faq summary::-webkit-details-marker{display:none;}
+  .faq-plus{flex:0 0 auto; color:var(--gold-dark); transition:transform 200ms var(--ease-out);}
+  details.faq[open] .faq-plus{transform:rotate(45deg);}
+  details.faq p{padding-bottom:16px; font-size:15px; opacity:1; transition:opacity 220ms ease 40ms;}
+  details.faq:not([open]) > p{opacity:0; transition:opacity 140ms ease;}
+
+  /* ---------- Checklist ---------- */
+  .progress-wrap{margin:20px 0 30px; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:18px 22px;}
+  .progress-top{display:flex; justify-content:space-between; font-size:14.5px; color:var(--ink-soft); margin-bottom:10px;}
+  #progress-count{color:var(--gold-dark); font-weight:700;}
+  .progress-track{height:8px; background:var(--line-soft); border-radius:6px; overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg, var(--gold-dark), var(--gold-light)); transition:width 420ms var(--ease-out);}
+
+  .check-group-head{display:flex; align-items:center; gap:10px; margin:30px 0 12px;}
+  .check-group-head .benefit-icon{width:30px; height:30px; border-radius:8px; margin-bottom:0;}
+  .check-group-head h3{font-size:16.5px; color:var(--ink); font-family:var(--sans); font-weight:600;}
+  .check-item{
+    display:flex; align-items:flex-start; gap:11px; padding:10px 8px; border-bottom:1px solid var(--line-soft);
+    cursor:pointer; border-radius:8px; transition:background 140ms var(--ease-out);
+  }
+  .check-item:hover{background:var(--gold-tint);}
+  .check-item:last-child{border-bottom:none;}
+  .check-item input{margin-top:3px; width:16px; height:16px; accent-color:var(--gold-dark); flex:0 0 auto; cursor:pointer;}
+  .check-item span{font-size:15px; color:var(--ink-soft);}
+  .check-item input:checked + span{color:var(--ink-faint); text-decoration:line-through;}
+
+  .note{font-size:14px; color:var(--ink-faint); margin-top:6px;}
+
+  @media (max-width: 880px){
+    .sidebar{position:fixed; left:0; top:0; bottom:0; transform:translateX(-104%); transition:transform 260ms var(--ease-out); box-shadow:20px 0 40px rgba(0,0,0,.35);}
+    .sidebar.open{transform:translateX(0);}
+    .menu-toggle{display:flex;}
+    .main{padding:80px 22px 70px;}
+    .benefit-grid, .directory, .phase-overview{grid-template-columns:1fr;}
+    .hero-banner{padding:44px 22px; min-height:auto;}
+    .panel h2{font-size:28px;}
+    .flow-row{flex-direction:column;}
+  }
+
+  .overlay{display:none; position:fixed; inset:0; background:rgba(10,8,5,.45); z-index:15;}
+  .overlay.show{display:block;}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#f3c332" stroke-width="1.6"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+</button>
+<div class="overlay" id="overlay"></div>
+
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg width="30" height="34" viewBox="0 0 30 34" fill="none">
+        <path d="M15 1 L15 33" stroke="#f3c332" stroke-width="2"/>
+        <path d="M8 9 L8 33" stroke="#f3c332" stroke-width="2"/>
+        <path d="M22 9 L22 33" stroke="#f3c332" stroke-width="2"/>
+        <path d="M3 16 L3 33" stroke="#d4a413" stroke-width="1.6"/>
+        <path d="M27 16 L27 33" stroke="#d4a413" stroke-width="1.6"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-name">MAJESTOR</div>
+        <span class="brand-tag">GO</span>
+      </div>
+    </div>
+    <div class="brand-sub">Tu ruta de bienvenida</div>
+
+    <ul class="navlist" id="navlist">
+      <li><button class="navlink active" data-target="bienvenida">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><path d="M12 2 L14.5 9 L22 9 L16 13.5 L18 21 L12 16.5 L6 21 L8 13.5 L2 9 L9.5 9 Z"/></svg>
+        Bienvenida
+      </button></li>
+      <li><button class="navlink" data-target="pasos">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><path d="M3 20 L3 15 L8 15 L8 11 L13 11 L13 6 L18 6 L18 20 Z"/></svg>
+        Primeros pasos
+      </button></li>
+      <li><button class="navlink" data-target="beneficios">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M8 12.5 L11 15.5 L16 9"/></svg>
+        Tus beneficios
+      </button></li>
+      <li><button class="navlink" data-target="referidos">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg>
+        Programa de referidos
+      </button></li>
+      <li><button class="navlink" data-target="comunidad">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg>
+        Comunidad y soporte
+      </button></li>
+      <li><button class="navlink" data-target="faq">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2 a2.5 2.5 0 1 1 3.6 2.3 c-1 .5 -1.1 1 -1.1 2"/><circle cx="12" cy="16.6" r=".4" fill="currentColor"/></svg>
+        Preguntas frecuentes
+      </button></li>
+      <li><button class="navlink" data-target="checklist">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icn"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M7 9 L9 11 L13 7"/><line x1="7" y1="15" x2="17" y2="15"/></svg>
+        Checklist
+      </button></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="pil"><span>PODER</span><span>◆</span><span>IMPACTO</span><span>◆</span><span>LEGADO</span></div>
+      <div class="support-mini">
+        ¿Necesitas ayuda?<br>
+        <a href="https://wa.me/573016117467" target="_blank" rel="noopener">WhatsApp +57 301 611 7467</a><br>
+        <a href="mailto:soporte@majestorpro.com">soporte@majestorpro.com</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ================= BIENVENIDA ================= -->
+    <section class="panel active" id="panel-bienvenida">
+
+      <div class="hero-banner">
+        <div class="hero-glow"></div>
+        <div class="hero-graphic" aria-hidden="true">
+          <svg width="100%" height="230" viewBox="0 0 200 230" fill="none">
+            <defs>
+              <linearGradient id="heroBarGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f3c332"/>
+                <stop offset="1" stop-color="#8a6300"/>
+              </linearGradient>
+            </defs>
+            <path d="M100 4 L100 224" stroke="url(#heroBarGradient)" stroke-width="15" stroke-linecap="round"/>
+            <path d="M58 54 L58 224" stroke="url(#heroBarGradient)" stroke-width="15" stroke-linecap="round"/>
+            <path d="M142 54 L142 224" stroke="url(#heroBarGradient)" stroke-width="15" stroke-linecap="round"/>
+            <path d="M20 100 L20 224" stroke="url(#heroBarGradient)" stroke-width="11" stroke-linecap="round" opacity=".65"/>
+            <path d="M180 100 L180 224" stroke="url(#heroBarGradient)" stroke-width="11" stroke-linecap="round" opacity=".65"/>
+          </svg>
+        </div>
+        <div class="hero-copy">
+          <div class="hero-mark">
+            <svg width="26" height="30" viewBox="0 0 30 34" fill="none">
+              <path d="M15 1 L15 33" stroke="#f3c332" stroke-width="2"/>
+              <path d="M8 9 L8 33" stroke="#f3c332" stroke-width="2"/>
+              <path d="M22 9 L22 33" stroke="#f3c332" stroke-width="2"/>
+            </svg>
+            <span>MAJESTOR GO</span>
+          </div>
+          <h1>Bienvenido al comienzo de tu recorrido dentro de MAJESTOR.</h1>
+          <p>Formación continua, comunidad y liderazgo dentro de un mismo ecosistema. Este es tu punto de partida.</p>
+          <div class="hero-chips">
+            <div class="hero-chip"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg> MAJESTOR NETWORK</div>
+            <div class="hero-chip"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg> Programa de referidos</div>
+            <div class="hero-chip"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M8 12.5 L11 15.5 L16 9"/></svg> Comunidad activa</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15.5 14"/></svg>
+        Qué representa Majestor Go
+      </h3>
+      <p>Majestor Go es la puerta de entrada al ecosistema MAJESTOR: un espacio desde el cual podrás acceder a formación continua, conectarte con la comunidad, conocer nuevas herramientas y avanzar en el desarrollo de tus capacidades personales, profesionales y comerciales.</p>
+      <p>A partir de este momento podrás participar en MAJESTOR NETWORK, donde encontrarás clases en vivo y contenidos grabados relacionados con comunicación, liderazgo, crecimiento y negocios. También tendrás acceso al Club Oficial de MAJESTOR, al e-commerce y al programa de referidos correspondiente a Majestor Go.</p>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M7 9 L9 11 L13 7"/><line x1="7" y1="15" x2="17" y2="15"/></svg>
+        Qué encontrarás en esta ruta
+      </h3>
+      <div class="chip-row">
+        <div class="info-chip reveal"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M8 12.5 L11 15.5 L16 9"/><circle cx="12" cy="12" r="9"/></svg> Tus beneficios</div>
+        <div class="info-chip reveal" style="--d:60ms"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M3 20 L3 15 L8 15 L8 11 L13 11 L13 6 L18 6 L18 20 Z"/></svg> Acceso paso a paso</div>
+        <div class="info-chip reveal" style="--d:120ms"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg> Programa de referidos</div>
+        <div class="info-chip reveal" style="--d:180ms"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg> Grupos oficiales</div>
+        <div class="info-chip reveal" style="--d:240ms"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 4 V20 M4 9 H20"/></svg> Condiciones de membresía</div>
+      </div>
+
+      <p>No necesitas conocerlo todo desde el primer día. Avanza paso a paso y participa activamente en los espacios que MAJESTOR ha preparado para ti. Tu auspiciador será tu primer guía durante este proceso.</p>
+      <div class="hero-quote">Donde otros ven límites, nosotros construimos caminos.</div>
+    </section>
+
+    <!-- ================= PRIMEROS PASOS ================= -->
+    <section class="panel" id="panel-pasos">
+      <div class="head-row">
+        <div class="head-icon"><svg width="22" height="22" viewBox="0 0 24 24" class="icn"><path d="M3 20 L3 15 L8 15 L8 11 L13 11 L13 6 L18 6 L18 20 Z"/></svg></div>
+        <div><span class="eyebrow">RUTA DE ACTIVACIÓN</span><h2>Primeros pasos</h2></div>
+      </div>
+      <p class="lede">Sigue este orden para activar tu Majestor Go. Cada paso se abre con un clic — no tienes que leerlo todo de una vez.</p>
+
+      <div class="phase-overview">
+        <div class="phase-card reveal">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10 V7 a4 4 0 0 1 8 0 v3"/></svg></div>
+          <h4>Acceso</h4><span>Paso 1</span>
+        </div>
+        <div class="phase-card reveal" style="--d:60ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M13 2 L5 14 H12 L11 22 L19 10 H12 Z"/></svg></div>
+          <h4>Activación</h4><span>Pasos 2–4</span>
+        </div>
+        <div class="phase-card reveal" style="--d:120ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M4 5 H12 V19 H4 Z"/><path d="M12 5 H20 V19 H12 Z"/></svg></div>
+          <h4>Formación</h4><span>Pasos 5–10</span>
+        </div>
+        <div class="phase-card reveal" style="--d:180ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg></div>
+          <h4>Comparte y protege</h4><span>Pasos 11–13</span>
+        </div>
+      </div>
+
+      <div class="phase-label"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10 V7 a4 4 0 0 1 8 0 v3"/></svg> Acceso</div>
+      <div class="steps">
+        <details class="step" open>
+          <summary><span class="step-num">1</span><span class="step-title">Ingresa a tu Oficina Virtual</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Visita <a class="mini-link" href="https://majestorpro.com" target="_blank" rel="noopener">majestorpro.com</a>, selecciona "Oficina Virtual" e ingresa con el usuario y contraseña que creaste en tu registro. Ahí está tu backoffice: adquieres productos, revisas tu estado de activación y accedes a tus herramientas.</p></div>
+        </details>
+      </div>
+
+      <div class="phase-label"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><path d="M13 2 L5 14 H12 L11 22 L19 10 H12 Z"/></svg> Activación</div>
+      <div class="steps">
+        <details class="step">
+          <summary><span class="step-num">2</span><span class="step-title">Adquiere tu Majestor Go</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Dentro del backoffice, entra al e-commerce y adquiere Majestor Go. Tu registro incluye 7 días gratuitos; para seguir activo, adquiere el producto dentro de ese periodo.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">3</span><span class="step-title">Activa tu producto</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body">
+            <p>Si pagaste dentro de la plataforma, tu Majestor Go queda activo de inmediato. Si pagaste por fuera (enlace externo, transferencia u otro medio), solicita la activación manual a Soporte, indicando el producto y adjuntando el comprobante.</p>
+            <div class="field-hint">Mensaje sugerido: "Hola. Solicito la activación de mi Majestor Go. Pagué por fuera de la plataforma y adjunto el comprobante."</div>
+          </div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">4</span><span class="step-title">Confirma que esté activo</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Vuelve a tu backoffice y verifica que Majestor Go aparezca activo. Si algo no cuadra, comunícate con Soporte antes de seguir avanzando.</p></div>
+        </details>
+      </div>
+
+      <div class="phase-label"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><path d="M4 5 H12 V19 H4 Z"/><path d="M12 5 H20 V19 H12 Z"/></svg> Formación</div>
+      <div class="steps">
+        <details class="step">
+          <summary><span class="step-num">5</span><span class="step-title">Identifica tu ID de registro</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Tu ID personal se generó al registrarte: funciona como tu identificación dentro de MAJESTOR. No lo confundas con el código de acceso — son datos distintos, personales e intransferibles.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">6</span><span class="step-title">Obtén el código de acceso a NETWORK</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Con tu producto activo, busca en el backoffice el código de acceso a MAJESTOR NETWORK. Antes de abrir Zoom, ten a mano tu ID y este código.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">7</span><span class="step-title">Ingresa a MAJESTOR NETWORK</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Entra por <a class="mini-link" href="https://bit.ly/MAJESTORNETWORK" target="_blank" rel="noopener">bit.ly/MAJESTORNETWORK</a>, que lleva a Zoom. Deberás dar tu ID de registro y escribir el código de acceso; sin ambos datos no se autoriza el ingreso.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">8</span><span class="step-title">Inicia tu formación</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Consulta la programación y elige una primera clase. Participa en una sesión en vivo y revisa también un contenido grabado en <a class="mini-link" href="https://tranformation-university-s-site-3756.thinkific.com/users/sign_in" target="_blank" rel="noopener">la plataforma de clases grabadas</a>.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">9</span><span class="step-title">Conéctate con la comunidad</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Ingresa al Club Oficial de MAJESTOR: ahí se comparte programación, clases en vivo, novedades, eventos y pódcast.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">10</span><span class="step-title">Define tu objetivo inicial</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body">
+            <p>¿Qué deseas conseguir: comunicarte con más seguridad, fortalecer tu liderazgo, una habilidad comercial? Compártelo con tu auspiciador para que pueda orientarte.</p>
+            <div class="field-hint">Mi objetivo inicial es: ____________________</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="phase-label"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg> Comparte y protege</div>
+      <div class="steps">
+        <details class="step">
+          <summary><span class="step-num">11</span><span class="step-title">Explora el e-commerce</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Conoce los productos de MAJESTOR y los publicados por miembros con Pack Trascendencia o Majestor Partner. Con Majestor Go puedes comprar, pero no cargar productos propios.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">12</span><span class="step-title">Activa tu programa de referidos</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Busca tu enlace personal en el backoffice y compártelo. Confirma que sea tu enlace, explica que Go es una membresía mensual y evita prometer resultados o ganancias.</p></div>
+        </details>
+        <details class="step">
+          <summary><span class="step-num">13</span><span class="step-title">Protege tu información de acceso</span><svg class="step-chevron" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary>
+          <div class="step-body"><p>Usuario, contraseña, ID y código de acceso son personales. No los compartas ni publiques capturas que los muestren. MAJESTOR nunca te pedirá tu contraseña por WhatsApp.</p></div>
+        </details>
+      </div>
+
+      <p class="note">¿Tuviste algún problema en el camino? Revisa <strong>Preguntas frecuentes</strong> — ahí cubrimos los inconvenientes más comunes.</p>
+    </section>
+
+    <!-- ================= BENEFICIOS ================= -->
+    <section class="panel" id="panel-beneficios">
+      <div class="head-row">
+        <div class="head-icon"><svg width="22" height="22" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M8 12.5 L11 15.5 L16 9"/></svg></div>
+        <div><span class="eyebrow">MAJESTOR GO</span><h2>Tus beneficios</h2></div>
+      </div>
+      <p class="lede">Majestor Go es la puerta de entrada al ecosistema MAJESTOR. Esto es exactamente lo que incluye.</p>
+
+      <div class="stat-row">
+        <div class="stat-chip cost reveal">
+          <span class="num">USD 30</span><span class="unit">/ mes</span>
+          <span class="desc">Edad mínima 21 años · debes mantenerlo activo para conservar los accesos.</span>
+        </div>
+      </div>
+
+      <div class="benefit-grid">
+        <div class="benefit reveal">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M6 12 a6 6 0 0 1 12 0"/><path d="M3 12 a9 9 0 0 1 18 0"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></div>
+          <h4>MAJESTOR NETWORK</h4><p>Formación continua en comunicación, liderazgo, crecimiento y negocios.</p>
+        </div>
+        <div class="benefit reveal" style="--d:40ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M10 8.5 L16 12 L10 15.5 Z" fill="currentColor" stroke="none"/></svg></div>
+          <h4>Clases en vivo</h4><p>Con tu ID de registro y el código de acceso de tu backoffice.</p>
+        </div>
+        <div class="benefit reveal" style="--d:80ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M4 6 H16 V17 H4 Z"/><path d="M8 6 V3 H20 V14 H16"/></svg></div>
+          <h4>Contenidos grabados</h4><p>Biblioteca disponible en cualquier momento.</p>
+        </div>
+        <div class="benefit reveal" style="--d:120ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg></div>
+          <h4>Club Oficial</h4><p>Programación, recordatorios y novedades de la comunidad.</p>
+        </div>
+        <div class="benefit reveal" style="--d:160ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M12 3 L14 9 L20 9 L15 13 L17 19 L12 15.5 L7 19 L9 13 L4 9 L10 9 Z"/></svg></div>
+          <h4>Invitaciones de asistencia</h4><p>Eventos, lives, pódcast y otras actividades virtuales.</p>
+        </div>
+        <div class="benefit reveal" style="--d:200ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M6 8 H18 L17 20 H7 Z"/><path d="M9 8 V6 a3 3 0 0 1 6 0 v2"/></svg></div>
+          <h4>Acceso al e-commerce</h4><p>Conoce y adquiere productos del ecosistema MAJESTOR.</p>
+        </div>
+        <div class="benefit reveal" style="--d:240ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M9 15 L15 9 M10 6 L13.5 6 a3 3 0 0 1 0 6 H12 M14 18 L10.5 18 a3 3 0 0 1 0 -6 H12"/></svg></div>
+          <h4>Enlace personal</h4><p>Compártelo con quienes deseen registrarse como tus referidos.</p>
+        </div>
+        <div class="benefit reveal" style="--d:280ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M9 15 L15 9 M9.5 10 a.5 .5 0 1 0 0-1 a.5 .5 0 0 0 0 1 M14.5 15 a.5 .5 0 1 0 0-1 a.5 .5 0 0 0 0 1"/></svg></div>
+          <h4>Comisión por referidos</h4><p>50 % recurrente mientras tus referidos permanezcan activos.</p>
+        </div>
+      </div>
+
+      <div class="not-included">
+        <h4><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><line x1="8" y1="8" x2="16" y2="16"/><line x1="16" y1="8" x2="8" y2="16"/></svg> Majestor Go no incluye</h4>
+        <ul>
+          <li>Publicación de productos propios en el e-commerce.</li>
+          <li>Certificación del programa de oratoria de cuatro meses.</li>
+          <li>Cupos para LUMIA.</li>
+          <li>Aplicación para ser Embajador Comercial.</li>
+          <li>Uso de la marca MAJESTOR.</li>
+          <li>Grupo personalizado de acompañamiento.</li>
+          <li>Beneficios exclusivos de Pack Trascendencia o Majestor Partner.</li>
+        </ul>
+      </div>
+      <p class="note">¿Te interesa Pack Trascendencia o Majestor Partner? Escribe a <a href="mailto:comercial@majestorpro.com">comercial@majestorpro.com</a> o consulta con tu auspiciador.</p>
+    </section>
+
+    <!-- ================= REFERIDOS ================= -->
+    <section class="panel" id="panel-referidos">
+      <div class="head-row">
+        <div class="head-icon"><svg width="22" height="22" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg></div>
+        <div><span class="eyebrow">TU COMUNIDAD ES TU ACTIVO</span><h2>Programa de referidos</h2></div>
+      </div>
+      <p class="lede">Recibes una comisión recurrente por cada Majestor Go que adquieran y renueven las personas registradas mediante tu enlace.</p>
+
+      <div class="stat-row">
+        <div class="stat-chip earn reveal"><span class="num">50%</span><span class="unit">comisión recurrente</span></div>
+        <div class="stat-chip earn reveal" style="--d:60ms"><span class="num">USD 30</span><span class="unit">saldo mínimo para retirar</span></div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-step reveal">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M9 15 L15 9 M10 6 L13.5 6 a3 3 0 0 1 0 6 H12 M14 18 L10.5 18 a3 3 0 0 1 0 -6 H12"/></svg></div>
+          <h4>1. Encuentra tu enlace</h4><p>Dentro de tu backoffice, en la Oficina Virtual.</p>
+        </div>
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 24 24" class="icn"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg></div>
+        <div class="flow-step reveal" style="--d:60ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><path d="M6 12 a6 6 0 0 1 12 0"/><path d="M3 12 a9 9 0 0 1 18 0"/></svg></div>
+          <h4>2. Compártelo</h4><p>Solo tu enlace — otro enlace vincula a otra cuenta.</p>
+        </div>
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 24 24" class="icn"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg></div>
+        <div class="flow-step reveal" style="--d:120ms">
+          <div class="benefit-icon"><svg width="17" height="17" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M9 15 L15 9"/></svg></div>
+          <h4>3. Recibe tu comisión</h4><p>50 % recurrente mientras tu referido esté activo.</p>
+        </div>
+      </div>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M8 12.5 L11 15.5 L16 9"/></svg>
+        Cuándo se genera la comisión
+      </h3>
+      <ul>
+        <li>La persona se registró mediante tu enlace personal.</li>
+        <li>Su Majestor Go fue pagado y el pago está confirmado.</li>
+        <li>Su membresía aparece activa y cumple las condiciones del programa.</li>
+      </ul>
+      <p>Esta comisión aplica exclusivamente a Majestor Go — no se extiende automáticamente a Pack Trascendencia, Majestor Partner ni al e-commerce.</p>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+        Solicitar el pago
+      </h3>
+      <div class="benefit-grid">
+        <div class="benefit"><h4>Requisito</h4><p>Tu Majestor Go activo y saldo disponible de al menos USD 30.</p></div>
+        <div class="benefit"><h4>Calendario</h4><p>Solicitudes los martes; pagos procesados los viernes.</p></div>
+      </div>
+      <p>Consulta tus referidos, ventas, comisiones y saldo en tu backoffice. Si una comisión no aparece, verifica primero el registro y el pago; si continúa, escribe a <a href="mailto:financiero@majestorpro.com">financiero@majestorpro.com</a> con tu nombre, tu ID, el nombre del referido y una descripción breve.</p>
+      <p class="note">El programa de referidos no constituye una relación laboral ni garantiza un nivel determinado de ingresos.</p>
+    </section>
+
+    <!-- ================= COMUNIDAD ================= -->
+    <section class="panel" id="panel-comunidad">
+      <div class="head-row">
+        <div class="head-icon"><svg width="22" height="22" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg></div>
+        <div><span class="eyebrow">MANTENTE CONECTADO</span><h2>Comunidad y soporte</h2></div>
+      </div>
+      <p class="lede">Utiliza siempre los canales oficiales de MAJESTOR para recibir información confiable.</p>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg>
+        Tu grupo de WhatsApp
+      </h3>
+      <div class="group-row">
+        <strong>Club Oficial de MAJESTOR</strong>
+        <a href="https://chat.whatsapp.com/GRKbXM9ECO2K1Oj2NVbm0T?mode=gi_t" target="_blank" rel="noopener">Ingresar al grupo →</a>
+      </div>
+      <p class="note">Ahí se comparte la programación de clases, recordatorios y novedades.</p>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
+        Directorio de contacto
+      </h3>
+      <div class="directory">
+        <div class="contact-card reveal">
+          <div class="benefit-icon"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M12 8 v4 l3 2"/></svg></div>
+          <h4>Soporte</h4><p>Activación, accesos e inconvenientes técnicos.</p>
+          <a href="https://wa.me/573016117467" target="_blank" rel="noopener">WhatsApp +57 301 611 7467</a>
+          <a href="mailto:soporte@majestorpro.com">soporte@majestorpro.com</a>
+        </div>
+        <div class="contact-card reveal" style="--d:40ms">
+          <div class="benefit-icon"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><path d="M9 15 L15 9 M9.5 10 a.5 .5 0 1 0 0-1 a.5 .5 0 0 0 0 1 M14.5 15 a.5 .5 0 1 0 0-1 a.5 .5 0 0 0 0 1"/></svg></div>
+          <h4>Comercial</h4><p>Productos, programa de referidos y orientación comercial.</p>
+          <a href="mailto:comercial@majestorpro.com">comercial@majestorpro.com</a>
+        </div>
+        <div class="contact-card reveal" style="--d:80ms">
+          <div class="benefit-icon"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="8"/><path d="M12 7 v10 M9.5 9.5 h3.2 a1.8 1.8 0 0 1 0 3.6 H9.8 a1.8 1.8 0 0 0 0 3.6 h3.7"/></svg></div>
+          <h4>Financiero</h4><p>Pagos, comisiones y liquidaciones.</p>
+          <a href="mailto:financiero@majestorpro.com">financiero@majestorpro.com</a>
+        </div>
+        <div class="contact-card reveal" style="--d:120ms">
+          <div class="benefit-icon"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><path d="M4 6 H16 V17 H4 Z"/><path d="M8 6 V3 H20 V14 H16"/></svg></div>
+          <h4>Educación</h4><p>Programación, contenidos y rutas de aprendizaje.</p>
+          <a href="mailto:educacion@majestorpro.com">educacion@majestorpro.com</a>
+        </div>
+        <div class="contact-card reveal" style="--d:160ms">
+          <div class="benefit-icon"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><path d="M12 2 L14.5 9 L22 9 L16 13.5 L18 21 L12 16.5 L6 21 L8 13.5 L2 9 L9.5 9 Z"/></svg></div>
+          <h4>LUMIA</h4><p>Actividades infantiles y juveniles.</p>
+          <a href="mailto:lumiakids@majestorpro.com">lumiakids@majestorpro.com</a>
+        </div>
+        <div class="contact-card reveal" style="--d:200ms">
+          <div class="benefit-icon"><svg width="16" height="16" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M12 7 a5 5 0 0 0 0 10 c1.5 0 2-1 2-2 M8 12 h8"/></svg></div>
+          <h4>Redes oficiales</h4><p>Instagram, Facebook y YouTube: @somosmajestor</p>
+          <a href="https://majestorpro.com" target="_blank" rel="noopener">majestorpro.com</a>
+        </div>
+      </div>
+
+      <h3 class="section-h">
+        <svg class="mini-icn" width="18" height="18" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Recomendaciones para la comunidad
+      </h3>
+      <ul>
+        <li>Revisa la programación antes de repetir una pregunta ya respondida.</li>
+        <li>Mantén un trato respetuoso con los demás integrantes.</li>
+        <li>No publiques datos personales, contraseñas, ID ni códigos de acceso.</li>
+        <li>No compartas los enlaces de los grupos con quien no tenga el producto correspondiente.</li>
+        <li>Dirige tus solicitudes personales al canal de Soporte, no al grupo general.</li>
+      </ul>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section class="panel" id="panel-faq">
+      <div class="head-row">
+        <div class="head-icon"><svg width="22" height="22" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2 a2.5 2.5 0 1 1 3.6 2.3 c-1 .5 -1.1 1 -1.1 2"/><circle cx="12" cy="16.6" r=".4" fill="currentColor" stroke="none"/></svg></div>
+        <div><span class="eyebrow">RESOLVEMOS TUS DUDAS</span><h2>Preguntas frecuentes</h2></div>
+      </div>
+      <p class="lede">Lo que más preguntan quienes están comenzando con Majestor Go.</p>
+
+      <div class="faq-cat"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10 V7 a4 4 0 0 1 8 0 v3"/></svg> Acceso y activación</div>
+      <details class="faq"><summary>¿Dónde ingreso a mi Oficina Virtual? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Ingresa a majestorpro.com, selecciona "Oficina Virtual" y utiliza el usuario y la contraseña que creaste durante tu registro.</p></details>
+      <details class="faq"><summary>¿Debo registrarme nuevamente? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>No. Si recibiste esta ruta de bienvenida, tu registro ya fue realizado. Utiliza el mismo usuario y contraseña que creaste inicialmente.</p></details>
+      <details class="faq"><summary>¿Qué es el backoffice? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Es tu Oficina Virtual. Desde ahí consultas tu información, accedes al e-commerce, revisas anuncios y consultas tus referidos, ventas y comisiones.</p></details>
+      <details class="faq"><summary>¿Cuánto tiempo tengo para adquirir un producto? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>La plataforma concede siete días iniciales gratuitos desde el registro. Para continuar activo, debes adquirir Majestor Go dentro de ese periodo.</p></details>
+      <details class="faq"><summary>¿Qué pasa según cómo realicé el pago? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Dentro de la plataforma: activación inmediata. Por fuera: solicita activación manual a Soporte, indicando el producto y adjuntando el comprobante.</p></details>
+      <details class="faq"><summary>¿Qué hago si mi producto no aparece activo? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Si pagaste dentro de la plataforma, comunícate con Soporte. Si pagaste por fuera, envía el comprobante y espera la confirmación.</p></details>
+
+      <div class="faq-cat"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M4 6 H16 V17 H4 Z"/><path d="M8 6 V3 H20 V14 H16"/></svg> Formación</div>
+      <details class="faq"><summary>¿El ID de registro y el código de acceso son lo mismo? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>No. El ID es tu identificación personal; el código de acceso está en el backoffice y permite entrar a las sesiones de NETWORK. Necesitas ambos.</p></details>
+      <details class="faq"><summary>¿Cómo ingreso a las clases en vivo? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Ten a mano tu ID y el código de acceso, luego entra a bit.ly/MAJESTORNETWORK. El enlace lleva directo a Zoom.</p></details>
+      <details class="faq"><summary>¿Dónde puedo ver las clases grabadas? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>En la plataforma Thinkific, mediante el enlace de tu ruta de activación.</p></details>
+      <details class="faq"><summary>¿Dónde se publica la programación? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>En los grupos oficiales de WhatsApp y en la sección de anuncios del backoffice.</p></details>
+      <details class="faq"><summary>¿Qué es un auspiciador? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Es la persona mediante cuyo enlace realizaste tu registro. Será tu primer guía dentro de MAJESTOR.</p></details>
+
+      <div class="faq-cat"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg> Comunidad y referidos</div>
+      <details class="faq"><summary>¿Puedo compartir los enlaces de los grupos? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>No debes compartirlos con personas que no tengan activo el producto correspondiente.</p></details>
+      <details class="faq"><summary>¿Puedo publicar mis propios productos en el e-commerce? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Con Majestor Go puedes comprar, pero no publicar productos propios — esa opción está disponible desde Pack Trascendencia en adelante.</p></details>
+      <details class="faq"><summary>¿Dónde encuentro mi enlace personal de registro? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Dentro de tu backoffice. Compártelo con quienes deseen registrarse como tus referidos.</p></details>
+      <details class="faq"><summary>¿Por qué es importante usar mi propio enlace? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Permite que la plataforma vincule correctamente a tu cuenta el registro, las ventas y las comisiones. Si usan el enlace de otro usuario, quedan vinculados a esa persona.</p></details>
+      <details class="faq"><summary>¿Dónde consulto mis referidos, ventas y comisiones? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Directamente en tu backoffice, junto con el saldo disponible y las opciones para solicitar pagos.</p></details>
+      <details class="faq"><summary>¿A quién contacto si tengo una dificultad? <svg class="faq-plus" width="16" height="16" viewBox="0 0 24 24" class="icn"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></summary><p>Tu auspiciador es tu primer guía. Para activaciones o dificultades técnicas, comunícate con Soporte por WhatsApp o correo.</p></details>
+    </section>
+
+    <!-- ================= CHECKLIST ================= -->
+    <section class="panel" id="panel-checklist">
+      <div class="head-row">
+        <div class="head-icon"><svg width="22" height="22" viewBox="0 0 24 24" class="icn"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M7 9 L9 11 L13 7"/><line x1="7" y1="15" x2="17" y2="15"/></svg></div>
+        <div><span class="eyebrow">TU PROGRESO</span><h2>Checklist de activación</h2></div>
+      </div>
+      <p class="lede">Marca cada casilla a medida que avances. No necesitas hacerlo todo el mismo día.</p>
+
+      <div class="progress-wrap">
+        <div class="progress-top"><span>Progreso general</span><span><span id="progress-count">0</span> / <span id="progress-total">0</span> completado</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10 V7 a4 4 0 0 1 8 0 v3"/></svg></div><h3>Mi cuenta y acceso</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Guardé el usuario y la contraseña que creé durante el registro.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Identifiqué mi ID personal de registro.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Comprendí que mi ID es diferente al código de acceso a NETWORK.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Confirmé quién es mi auspiciador.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Ingresé correctamente a mi Oficina Virtual.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M13 2 L5 14 H12 L11 22 L19 10 H12 Z"/></svg></div><h3>Mi Majestor Go</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Adquirí Majestor Go y verifiqué que aparece activo.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Comprendí el valor de USD 30 mensuales y que debo mantenerlo activo.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Identifiqué la fecha de mi próximo pago.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Si pagué por fuera, envié mi comprobante a Soporte.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M4 5 H20 V16 H9 L5 20 V16 H4 Z"/></svg></div><h3>NETWORK y formación</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Encontré el código de acceso a MAJESTOR NETWORK.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Participé en una primera sesión en vivo.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Ingresé a la plataforma de clases grabadas.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Definí mi objetivo inicial dentro de MAJESTOR.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Sé dónde se publica la programación.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><circle cx="12" cy="12" r="9"/><path d="M8 12.5 L11 15.5 L16 9"/></svg></div><h3>Comunidad</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Ingresé al Club Oficial de MAJESTOR.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Revisé las recomendaciones para usar los grupos.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Guardé los canales oficiales de MAJESTOR.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="16" r="3.4"/><path d="M10.8 9.8 L14.2 14.2"/></svg></div><h3>E-commerce y referidos</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Ingresé al e-commerce y conocí los productos disponibles.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Comprendí que Go permite comprar, no publicar productos propios.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Encontré mi enlace personal de registro.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Sé dónde consultar mis referidos, ventas y comisiones.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Comprendí que la comisión del 50 % es recurrente.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div><h3>Solicitud de comisiones</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Sé que necesito mi Majestor Go activo para solicitar pago.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Comprendí que el monto mínimo es de USD 30.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Sé que las solicitudes son los martes y los pagos los viernes.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Confirmé que mi información de pago está actualizada.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M12 3 L4 7 V12 C4 17 7.5 20.5 12 22 C16.5 20.5 20 17 20 12 V7 Z"/></svg></div><h3>Seguridad</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Comprendí que usuario, contraseña, ID y código son personales.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Confirmé que no debo compartir capturas con mis datos.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Sé a quién acudir si detecto actividad que no reconozco.</span></label>
+
+      <div class="check-group-head"><div class="benefit-icon"><svg width="15" height="15" viewBox="0 0 24 24" class="icn"><path d="M12 2 L14.5 9 L22 9 L16 13.5 L18 21 L12 16.5 L6 21 L8 13.5 L2 9 L9.5 9 Z"/></svg></div><h3>Mis siguientes pasos</h3></div>
+      <label class="check-item"><input type="checkbox"><span>Revisé todos los beneficios incluidos en Majestor Go.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Identifiqué un aprendizaje que puedo aplicar ya mismo.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Compartí mi avance con mi auspiciador.</span></label>
+      <label class="check-item"><input type="checkbox"><span>Conozco las diferencias entre Go, Trascendencia y Partner.</span></label>
+
+      <p class="note" style="margin-top:20px">Esta casilla se guarda solo en esta sesión de tu navegador. ¿Ayuda? WhatsApp +57 301 611 7467 · soporte@majestorpro.com</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const navlinks = document.querySelectorAll('.navlink');
+  const panels = document.querySelectorAll('.panel');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const menuToggle = document.getElementById('menuToggle');
+
+  navlinks.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-target');
+      navlinks.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + target).classList.add('active');
+      window.scrollTo({top:0, behavior:'instant'});
+      closeMobileMenu();
+      requestAnimationFrame(initReveal);
+    });
+  });
+
+  function openMobileMenu(){ sidebar.classList.add('open'); overlay.classList.add('show'); }
+  function closeMobileMenu(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+  menuToggle.addEventListener('click', () => { sidebar.classList.contains('open') ? closeMobileMenu() : openMobileMenu(); });
+  overlay.addEventListener('click', closeMobileMenu);
+
+  // Checklist progress
+  const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+  const countEl = document.getElementById('progress-count');
+  const totalEl = document.getElementById('progress-total');
+  const fillEl = document.getElementById('progress-fill');
+  function updateProgress(){
+    const total = checkboxes.length;
+    const checked = document.querySelectorAll('.check-item input[type="checkbox"]:checked').length;
+    countEl.textContent = checked; totalEl.textContent = total;
+    fillEl.style.width = (total ? (checked/total*100) : 0) + '%';
+  }
+  checkboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+  updateProgress();
+
+  // Scroll reveal
+  let io;
+  function initReveal(){
+    if(io) io.disconnect();
+    io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15, rootMargin:'0px 0px -30px 0px'});
+    document.querySelectorAll('.panel.active .reveal:not(.in-view)').forEach(el=>io.observe(el));
+  }
+  initReveal();
+
+  // Smooth, elegant expand/collapse for steps and FAQ accordions
+  function setupAnimatedDetails(selector){
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll(selector).forEach(details => {
+      const summary = details.querySelector('summary');
+      const content = summary ? summary.nextElementSibling : null;
+      if(!summary || !content) return;
+      let anim = null, isClosing = false, isExpanding = false;
+
+      summary.addEventListener('click', (e) => {
+        e.preventDefault();
+        details.style.overflow = 'hidden';
+        if (isClosing || !details.open) {
+          openPanel();
+        } else if (isExpanding || details.open) {
+          shrinkPanel();
+        }
+      });
+
+      function shrinkPanel(){
+        isClosing = true;
+        const startH = details.offsetHeight + 'px';
+        const endH = summary.offsetHeight + 'px';
+        if (anim) anim.cancel();
+        anim = details.animate({height:[startH, endH]}, {duration:220, easing:'cubic-bezier(0.77,0,0.175,1)'});
+        anim.onfinish = () => finish(false);
+        anim.oncancel = () => { isClosing = false; };
+      }
+      function openPanel(){
+        details.style.height = details.offsetHeight + 'px';
+        details.open = true;
+        requestAnimationFrame(() => expandPanel());
+      }
+      function expandPanel(){
+        isExpanding = true;
+        const startH = details.offsetHeight + 'px';
+        const endH = (summary.offsetHeight + content.offsetHeight) + 'px';
+        if (anim) anim.cancel();
+        anim = details.animate({height:[startH, endH]}, {duration:280, easing:'cubic-bezier(0.23,1,0.32,1)'});
+        anim.onfinish = () => finish(true);
+        anim.oncancel = () => { isExpanding = false; };
+      }
+      function finish(isOpen){
+        details.open = isOpen;
+        anim = null; isClosing = false; isExpanding = false;
+        details.style.height = '';
+        details.style.overflow = '';
+      }
+    });
+  }
+  setupAnimatedDetails('.step');
+  setupAnimatedDetails('.faq');
+</script>
+
+</body>
+</html>
